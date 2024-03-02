@@ -1869,6 +1869,7 @@ class _CustomCalendarScrollViewState extends State<CustomCalendarScrollView>
               currentState._timelineViewVerticalScrollController!.offset,
           viewHeaderHeight,
           timeLabelWidth);
+      if (targetResourceIndex < 0) return; // Fix drag outside view
       if (targetResourceIndex >
           widget.calendar.dataSource!.resources!.length - 1) {
         targetResourceIndex = widget.calendar.dataSource!.resources!.length - 1;
@@ -2065,6 +2066,7 @@ class _CustomCalendarScrollViewState extends State<CustomCalendarScrollView>
               currentState._timelineViewVerticalScrollController!.offset,
           viewHeaderHeight,
           timeLabelWidth);
+      if (targetResourceIndex < 0) return; // Fix drag outside view
       if (targetResourceIndex >
           widget.calendar.dataSource!.resources!.length - 1) {
         targetResourceIndex = widget.calendar.dataSource!.resources!.length - 1;
@@ -5905,44 +5907,54 @@ class _CalendarViewState extends State<_CalendarView>
   /// Updates the resource panel scroll based on timeline scroll in vertical
   /// direction.
   void _updateResourcePanelScroll() {
-    if (_updateCalendarStateDetails.currentViewVisibleDates ==
-        widget.visibleDates) {
-      widget.removePicker();
-    }
+    try {
+      if (_updateCalendarStateDetails.currentViewVisibleDates ==
+          widget.visibleDates) {
+        widget.removePicker();
+      }
+  
+      if (widget.resourcePanelScrollController == null ||
+          !CalendarViewHelper.isResourceEnabled(
+              widget.calendar.dataSource, widget.view)) {
+        return;
+      }
 
-    if (widget.resourcePanelScrollController == null ||
-        !CalendarViewHelper.isResourceEnabled(
-            widget.calendar.dataSource, widget.view)) {
-      return;
-    }
-
-    if (_timelineViewVerticalScrollController != null &&
-        _timelineViewVerticalScrollController!.hasClients &&
-        widget.resourcePanelScrollController!.offset !=
-            _timelineViewVerticalScrollController!.offset) {
-      _timelineViewVerticalScrollController!
-          .jumpTo(widget.resourcePanelScrollController!.offset);
+      if (_timelineViewVerticalScrollController == null) return;
+  
+      if (_timelineViewVerticalScrollController != null &&
+          _timelineViewVerticalScrollController!.hasClients &&
+          widget.resourcePanelScrollController!.offset !=
+              _timelineViewVerticalScrollController!.offset) {
+        _timelineViewVerticalScrollController!
+            .jumpTo(widget.resourcePanelScrollController!.offset);
+      }
+    } catch (e) {
+      // Ignore
     }
   }
 
   /// Updates the timeline view scroll in vertical direction based on resource
   /// panel scroll.
   void _updateResourceScroll() {
-    if (_updateCalendarStateDetails.currentViewVisibleDates ==
-        widget.visibleDates) {
-      widget.removePicker();
-    }
-
-    if (widget.resourcePanelScrollController == null ||
-        !CalendarViewHelper.isResourceEnabled(
-            widget.calendar.dataSource, widget.view)) {
-      return;
-    }
-
-    if (widget.resourcePanelScrollController!.offset !=
-        _timelineViewVerticalScrollController!.offset) {
-      widget.resourcePanelScrollController!
-          .jumpTo(_timelineViewVerticalScrollController!.offset);
+    try {
+      if (_updateCalendarStateDetails.currentViewVisibleDates ==
+          widget.visibleDates) {
+        widget.removePicker();
+      }
+  
+      if (widget.resourcePanelScrollController == null ||
+          !CalendarViewHelper.isResourceEnabled(
+              widget.calendar.dataSource, widget.view)) {
+        return;
+      }
+  
+      if (widget.resourcePanelScrollController!.offset !=
+          _timelineViewVerticalScrollController!.offset) {
+        widget.resourcePanelScrollController!
+            .jumpTo(_timelineViewVerticalScrollController!.offset);
+      }
+    } catch (e) {
+      // Ignore
     }
   }
 
